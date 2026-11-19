@@ -7,6 +7,7 @@
       this.observer = null;
       this.isRunning = false;
       this.wasAdShowing = false;
+      this.adFastForwarded = false;
       this.savedPlaybackRate = 1;
       this.savedMuted = false;
 
@@ -19,7 +20,7 @@
 
       this.tick();
 
-      this.intervalId = setInterval(() => this.tick(), 150);
+      this.intervalId = setInterval(() => this.tick(), 100);
 
       window.addEventListener("yt-navigate-finish", this.onNavigate);
       window.addEventListener("spfdone", this.onNavigate);
@@ -29,6 +30,7 @@
 
     onNavigate() {
       this.wasAdShowing = false;
+      this.adFastForwarded = false;
       this.tick();
       this.attachObserver();
     }
@@ -52,26 +54,89 @@
       });
     }
 
+    triggerClick(el) {
+      if (!el) return;
+      try {
+        el.click();
+      } catch (_) {}
+      try {
+        const opts = { bubbles: true, cancelable: true, view: window };
+        el.dispatchEvent(new PointerEvent("pointerdown", opts));
+        el.dispatchEvent(new MouseEvent("mousedown", opts));
+        el.dispatchEvent(new PointerEvent("pointerup", opts));
+        el.dispatchEvent(new MouseEvent("mouseup", opts));
+        el.dispatchEvent(new MouseEvent("click", opts));
+      } catch (_) {}
+    }
+
     clickSkipButtons() {
-      const skipButtons = [
-        ".ytp-skip-ad-button",
-        ".ytp-ad-skip-button",
+      // 1. Selector-based search for skip buttons
+      const skipSelectors = [
         ".ytp-ad-skip-button-modern",
-        ".ytp-ad-skip-button-slot button",
+        ".ytp-skip-ad-button-modern",
+        "button.ytp-ad-skip-button-modern",
+        "button.ytp-skip-ad-button-modern",
+        ".ytp-ad-skip-button",
+        ".ytp-skip-ad-button",
         "button.ytp-ad-skip-button",
-        ".ytp-ad-text.ytp-ad-skip-button-text",
-        ".videoAdUiSkipButton",
+        "button.ytp-skip-ad-button",
+        ".ytp-ad-skip-button-slot button",
         ".ytp-ad-skip-button-container button",
         "[id^='skip-button'] button",
-        ".ytp-ad-skip-button-slot"
+        ".videoAdUiSkipButton",
+        "button[aria-label*='Skip']",
+        "button[aria-label*='Bỏ qua']",
+        "[class*='ytp-ad-skip-button']"
       ];
-      for (const selector of skipButtons) {
-        const btn = document.querySelector(selector);
-        if (btn && typeof btn.click === "function") {
-          btn.click();
-          break;
-        }
+
+      for (const sel of skipSelectors) {
+        const found = document.querySelectorAll(sel);
+        found.forEach((el) => {
+          const btn = el.tagName === "BUTTON" ? el : (el.querySelector("button") || el);
+          this.triggerClick(btn);
+        });
       }
+
+      // 2. Text and aria-label search for "Bỏ qua" / "Skip" across all buttons and spans
+      const candidates = document.querySelectorAll(
+        "#movie_player button, .html5-video-player button, .ytp-ad-module button, [class*='skip'], [class*='Skip']"
+      );
+      candidates.forEach((el) => {
+        const text = (el.textContent || "").trim().toLowerCase();
+        const aria = (el.getAttribute("aria-label") || "").toLowerCase();
+        if (
+          text === "bỏ qua" ||
+          text.startsWith("bỏ qua") ||
+          text === "skip" ||
+          text.startsWith("skip") ||
+          aria.includes("bỏ qua") ||
+          aria.includes("skip")
+        ) {
+          const target = el.closest("button, [role='button']") || el;
+          this.triggerClick(target);
+        }
+      });
+    }
+
+    checkIsAdShowing() {
+      const player = document.querySelector("#movie_player, .html5-video-player");
+      if (player && (player.classList.contains("ad-showing") || player.classList.contains("ad-interrupting"))) {
+        return true;
+      }
+      if (document.querySelector(".ytp-ad-player-overlay, .ytp-ad-player-overlay-layout, .ytp-ad-text, [class*='ad-interrupting']")) {
+        return true;
+      }
+      // Check if skip button is present
+      const skipBtn = document.querySelector(
+        ".ytp-ad-skip-button-modern, .ytp-skip-ad-button, .ytp-ad-skip-button, [class*='skip-button']"
+      );
+      if (skipBtn) return true;
+
+      // Check for ad badge or "Được tài trợ" on player
+      const adBadge = document.querySelector(".ytp-ad-badge, .ytp-ad-text, #movie_player [aria-label*='Được tài trợ']");
+      if (adBadge) return true;
+
+      return false;
     }
 
     tick() {
@@ -81,15 +146,13 @@
     }
 
     handleVideoAds() {
+      const isAdShowing = this.checkIsAdShowing();
       const player = document.querySelector("#movie_player, .html5-video-player");
-      const isAdShowing = Boolean(
-        player && (player.classList.contains("ad-showing") || player.classList.contains("ad-interrupting"))
-      );
-
       const video = player
         ? player.querySelector("video")
         : (document.querySelector("video.html5-main-video") || document.querySelector("video"));
 
+      // Always try clicking skip buttons if present
       this.clickSkipButtons();
 
       if (isAdShowing) {
@@ -99,11 +162,23 @@
             this.savedMuted = Boolean(video.muted);
           }
           this.wasAdShowing = true;
+          this.adFastForwarded = false;
         }
 
         if (video) {
           video.muted = true;
           video.playbackRate = 16.0;
+
+          // Advance by 5s once so the skip button appears immediately
+          if (!this.adFastForwarded && Number.isFinite(video.duration) && video.duration > 0) {
+            this.adFastForwarded = true;
+            try {
+              if (video.currentTime < 5) {
+                video.currentTime = Math.min(video.currentTime + 5, video.duration);
+              }
+            } catch (_) {}
+          }
+
           if (video.paused && !video.ended) {
             video.play().catch(() => {});
           }
@@ -120,6 +195,7 @@
         });
       } else if (this.wasAdShowing) {
         this.wasAdShowing = false;
+        this.adFastForwarded = false;
         if (video) {
           video.playbackRate = this.savedPlaybackRate || 1;
           video.muted = this.savedMuted;
@@ -200,6 +276,7 @@
     stop() {
       this.isRunning = false;
       this.wasAdShowing = false;
+      this.adFastForwarded = false;
       if (this.intervalId) {
         clearInterval(this.intervalId);
         this.intervalId = null;
