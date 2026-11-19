@@ -14,8 +14,6 @@
     domains: {
       "youtube.com": [
         "#player-ads",
-        ".ad-showing",
-        ".ytp-ad-module",
         ".ytp-ad-overlay-container",
         ".ytp-ad-overlay-slot",
         ".ytp-ad-message-container",

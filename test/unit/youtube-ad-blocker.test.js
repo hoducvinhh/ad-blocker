@@ -42,7 +42,7 @@ function createMockElement(tagName = "div") {
   };
 }
 
-test("YouTubeAdBlocker handles and speeds up video ads safely with one-time skip guard", () => {
+test("YouTubeAdBlocker handles and speeds up video ads smoothly without buffer stall", () => {
   const blocker = new YouTubeAdBlocker();
 
   const mockVideo = {
@@ -82,18 +82,16 @@ test("YouTubeAdBlocker handles and speeds up video ads safely with one-time skip
   blocker.tick();
 
   assert.equal(blocker.wasAdShowing, true);
-  assert.equal(blocker.adSkipped, true);
   assert.equal(mockVideo.muted, true);
   assert.equal(mockVideo.playbackRate, 16.0);
   assert.equal(mockSkipBtn.clickCalled, 1);
-  assert.equal(mockVideo.currentTime, 30);
+  assert.equal(mockVideo.currentTime, 2);
 
   // Next tick: ad ended
   mockPlayer.classList.remove("ad-showing");
   blocker.tick();
 
   assert.equal(blocker.wasAdShowing, false);
-  assert.equal(blocker.adSkipped, false);
   assert.equal(mockVideo.playbackRate, 1.0);
   assert.equal(mockVideo.muted, false);
 });

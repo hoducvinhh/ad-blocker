@@ -7,7 +7,6 @@
       this.observer = null;
       this.isRunning = false;
       this.wasAdShowing = false;
-      this.adSkipped = false;
       this.savedPlaybackRate = 1;
       this.savedMuted = false;
 
@@ -30,7 +29,6 @@
 
     onNavigate() {
       this.wasAdShowing = false;
-      this.adSkipped = false;
       this.tick();
       this.attachObserver();
     }
@@ -101,35 +99,33 @@
             this.savedMuted = Boolean(video.muted);
           }
           this.wasAdShowing = true;
-          this.adSkipped = false;
         }
 
         if (video) {
           video.muted = true;
           video.playbackRate = 16.0;
-
-          // Skip ad video once safely
-          if (!this.adSkipped && Number.isFinite(video.duration) && video.duration > 0) {
-            this.adSkipped = true;
-            try {
-              video.currentTime = video.duration;
-            } catch (_) {}
+          if (video.paused && !video.ended) {
+            video.play().catch(() => {});
           }
         }
 
-        // Hide ad overlays on player
+        // Hide overlay banners on top of the player
         const overlays = document.querySelectorAll(
           ".ytp-ad-player-overlay, .ytp-ad-player-overlay-layout, .ytp-ad-overlay-container, .ytp-ad-message-container, .ytp-ad-action-interstitial, .ytp-ad-image-overlay, .ytp-ad-overlay-slot"
         );
         overlays.forEach((el) => {
-          el.style.setProperty("display", "none", "important");
+          if (el.style.display !== "none") {
+            el.style.setProperty("display", "none", "important");
+          }
         });
       } else if (this.wasAdShowing) {
         this.wasAdShowing = false;
-        this.adSkipped = false;
         if (video) {
           video.playbackRate = this.savedPlaybackRate || 1;
           video.muted = this.savedMuted;
+          if (video.paused && !video.ended) {
+            video.play().catch(() => {});
+          }
         }
       }
 
@@ -204,7 +200,6 @@
     stop() {
       this.isRunning = false;
       this.wasAdShowing = false;
-      this.adSkipped = false;
       if (this.intervalId) {
         clearInterval(this.intervalId);
         this.intervalId = null;
