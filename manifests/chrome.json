@@ -28,9 +28,19 @@
         "src/core/cosmetic-filter.js",
         "src/content/dom-scanner.js",
         "src/content/popup-protection.js",
+        "src/content/youtube-ad-blocker.js",
         "src/content/content.js"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "filters/cosmetic-rules.json",
+        "filters/custom-rules.json"
+      ],
+      "matches": ["<all_urls>"]
     }
   ]
 }

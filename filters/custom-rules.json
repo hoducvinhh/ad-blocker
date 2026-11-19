@@ -31,6 +31,22 @@
       "urlFilter": "||adnxs.com^",
       "resourceTypes": ["script", "sub_frame", "image", "xmlhttprequest"],
       "excludedInitiatorDomains": []
+    },
+    {
+      "id": 5,
+      "priority": 1,
+      "action": "block",
+      "urlFilter": "||youtube.com/api/stats/ads*",
+      "resourceTypes": ["xmlhttprequest", "ping", "script", "image"],
+      "excludedInitiatorDomains": []
+    },
+    {
+      "id": 6,
+      "priority": 1,
+      "action": "block",
+      "urlFilter": "||youtube.com/pagead/*",
+      "resourceTypes": ["xmlhttprequest", "ping", "script", "image"],
+      "excludedInitiatorDomains": []
     }
   ]
 }

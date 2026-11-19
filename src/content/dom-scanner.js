@@ -40,7 +40,9 @@
     }
 
     scanDocument() {
-      this.scanRoot(document.documentElement);
+      if (document.documentElement) {
+        this.scanRoot(document.documentElement);
+      }
     }
 
     enqueueNodes(nodes) {
@@ -81,7 +83,10 @@
           this.enqueueNodes(Array.from(mutation.addedNodes));
         });
       });
-      this.observer.observe(document.documentElement, { childList: true, subtree: true });
+      const target = document.documentElement || document;
+      if (target) {
+        this.observer.observe(target, { childList: true, subtree: true });
+      }
     }
 
     stop() {
