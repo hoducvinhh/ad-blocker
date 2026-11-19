@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Universal Ad Blocker Settings</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <aside>
+        <h1>Universal Ad Blocker</h1>
+        <nav aria-label="Settings sections">
+          <a href="#general">General</a>
+          <a href="#filters">Filter Lists</a>
+          <a href="#whitelist">Whitelist</a>
+          <a href="#privacy">Privacy</a>
+          <a href="#statistics">Statistics</a>
+          <a href="#about">About</a>
+        </nav>
+      </aside>
+
+      <div class="content">
+        <section id="general">
+          <h2>General</h2>
+          <label class="setting">
+            <span><strong>Global protection</strong><small>Enable network and cosmetic filtering.</small></span>
+            <input id="enabled" type="checkbox">
+          </label>
+          <label class="setting">
+            <span><strong>Cosmetic filtering</strong><small>Hide known advertising elements in page DOM.</small></span>
+            <input id="cosmetic" type="checkbox">
+          </label>
+          <label class="setting">
+            <span><strong>Behavior protection</strong><small>Reserved for a tested popup protection implementation.</small></span>
+            <input id="behavior" type="checkbox" disabled>
+          </label>
+        </section>
+
+        <section id="filters">
+          <h2>Filter Lists</h2>
+          <article class="filter-card">
+            <div>
+              <strong>Universal custom rules</strong>
+              <small id="ruleCount">Loading...</small>
+            </div>
+            <button id="refreshRules" type="button" class="secondary">Refresh</button>
+          </article>
+        </section>
+
+        <section id="whitelist">
+          <h2>Whitelist</h2>
+          <form id="whitelistForm">
+            <input id="domainInput" type="text" placeholder="example.com" autocomplete="off" required>
+            <button type="submit" class="primary">Add</button>
+          </form>
+          <ul id="whitelistList"></ul>
+        </section>
+
+        <section id="privacy">
+          <h2>Privacy</h2>
+          <p>Configuration and aggregate counters are stored locally in this browser. This extension does not send browsing history or personal data to a server.</p>
+        </section>
+
+        <section id="statistics">
+          <h2>Statistics</h2>
+          <div class="stats-grid">
+            <article><strong id="hiddenCount">0</strong><span>Elements hidden</span></article>
+            <article><strong id="blockedCount">0</strong><span>Requests blocked</span></article>
+          </div>
+          <button id="exportButton" type="button" class="secondary">Export configuration</button>
+          <input id="importInput" type="file" accept="application/json" hidden>
+          <button id="importButton" type="button" class="secondary">Import configuration</button>
+        </section>
+
+        <section id="about">
+          <h2>About</h2>
+          <p>Universal Ad Blocker 0.1.0</p>
+          <p>Shared Manifest V3 codebase for Chrome and Microsoft Edge.</p>
+        </section>
+
+        <p id="message" class="message" role="status"></p>
+      </div>
+    </main>
+    <script src="../shared/constants.js"></script>
+    <script src="../shared/domain-utils.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
