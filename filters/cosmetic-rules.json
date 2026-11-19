@@ -1,0 +1,17 @@
+{
+  "global": [
+    ".ad-banner",
+    ".ad-slot",
+    ".advertisement",
+    "[data-ad]",
+    "[data-ad-slot]",
+    "iframe[src*=\"doubleclick.net\"]",
+    "iframe[src*=\"googlesyndication.com\"]"
+  ],
+  "domains": {
+    "youtube.com": [
+      "ytd-ad-slot-renderer",
+      "ytd-in-feed-ad-layout-renderer"
+    ]
+  }
+}

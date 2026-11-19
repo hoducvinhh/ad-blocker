@@ -1,0 +1,36 @@
+{
+  "rules": [
+    {
+      "id": 1,
+      "priority": 1,
+      "action": "block",
+      "urlFilter": "||doubleclick.net^",
+      "resourceTypes": ["script", "sub_frame", "image", "xmlhttprequest"],
+      "excludedInitiatorDomains": []
+    },
+    {
+      "id": 2,
+      "priority": 1,
+      "action": "block",
+      "urlFilter": "||googlesyndication.com^",
+      "resourceTypes": ["script", "sub_frame", "image", "xmlhttprequest"],
+      "excludedInitiatorDomains": []
+    },
+    {
+      "id": 3,
+      "priority": 1,
+      "action": "block",
+      "urlFilter": "||googleadservices.com^",
+      "resourceTypes": ["script", "sub_frame", "image", "xmlhttprequest"],
+      "excludedInitiatorDomains": []
+    },
+    {
+      "id": 4,
+      "priority": 1,
+      "action": "block",
+      "urlFilter": "||adnxs.com^",
+      "resourceTypes": ["script", "sub_frame", "image", "xmlhttprequest"],
+      "excludedInitiatorDomains": []
+    }
+  ]
+}
