@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Universal Ad Blocker",
+  "description": "Block common advertising and tracking requests across Chromium browsers.",
+  "version": "0.1.0",
+  "permissions": [
+    "storage",
+    "tabs",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "action": {
+    "default_title": "Universal Ad Blocker",
+    "default_popup": "src/popup/popup.html"
+  },
+  "options_page": "src/options/options.html",
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": [
+        "src/shared/constants.js",
+        "src/shared/storage.js",
+        "src/shared/domain-utils.js",
+        "src/core/cosmetic-filter.js",
+        "src/content/dom-scanner.js",
+        "src/content/popup-protection.js",
+        "src/content/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

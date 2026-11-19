@@ -1,0 +1,14 @@
+{
+  "name": "universal-ad-blocker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-browser Manifest V3 ad blocking extension for Chrome and Edge",
+  "scripts": {
+    "clean": "node scripts/build.js clean",
+    "build": "npm run clean && npm run build:chrome && npm run build:edge",
+    "build:chrome": "node scripts/build.js chrome",
+    "build:edge": "node scripts/build.js edge",
+    "test": "node --test test/unit/*.test.js",
+    "package": "npm run build"
+  }
+}
