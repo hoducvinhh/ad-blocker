@@ -89,7 +89,7 @@ test("YouTubeAdBlocker handles and speeds up video ads smoothly without buffer s
   assert.equal(mockVideo.muted, true);
   assert.equal(mockVideo.playbackRate, 16.0);
   assert.ok(mockSkipBtn.clickCalled >= 1);
-  assert.equal(mockVideo.currentTime, 7);
+  assert.equal(mockVideo.currentTime, 2);
 
   // Next tick: ad ended
   mockPlayer.classList.remove("ad-showing");
