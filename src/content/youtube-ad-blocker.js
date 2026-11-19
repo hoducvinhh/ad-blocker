@@ -7,7 +7,6 @@
       this.observer = null;
       this.isRunning = false;
       this.wasAdShowing = false;
-      this.adFastForwarded = false;
       this.savedPlaybackRate = 1;
       this.savedMuted = false;
 
@@ -30,7 +29,6 @@
 
     onNavigate() {
       this.wasAdShowing = false;
-      this.adFastForwarded = false;
       this.tick();
       this.attachObserver();
     }
@@ -70,7 +68,6 @@
     }
 
     clickSkipButtons() {
-      // 1. Selector-based search for skip buttons
       const skipSelectors = [
         ".ytp-ad-skip-button-modern",
         ".ytp-skip-ad-button-modern",
@@ -83,23 +80,26 @@
         ".ytp-ad-skip-button-slot button",
         ".ytp-ad-skip-button-container button",
         "[id^='skip-button'] button",
+        "[id^='skip-button']",
         ".videoAdUiSkipButton",
         "button[aria-label*='Skip']",
         "button[aria-label*='Bỏ qua']",
-        "[class*='ytp-ad-skip-button']"
+        "[class*='ytp-ad-skip-button']",
+        "[class*='skip-button']"
       ];
 
       for (const sel of skipSelectors) {
         const found = document.querySelectorAll(sel);
         found.forEach((el) => {
-          const btn = el.tagName === "BUTTON" ? el : (el.querySelector("button") || el);
-          this.triggerClick(btn);
+          this.triggerClick(el);
+          const childBtn = el.querySelector("button");
+          if (childBtn) this.triggerClick(childBtn);
         });
       }
 
-      // 2. Text and aria-label search for "Bỏ qua" / "Skip" across all buttons and spans
+      // Search all buttons and spans containing "Bỏ qua" or "Skip"
       const candidates = document.querySelectorAll(
-        "#movie_player button, .html5-video-player button, .ytp-ad-module button, [class*='skip'], [class*='Skip']"
+        "#movie_player button, .html5-video-player button, .ytp-ad-module button, [class*='skip'], [class*='Skip'], .ytp-button, span"
       );
       candidates.forEach((el) => {
         const text = (el.textContent || "").trim().toLowerCase();
@@ -126,13 +126,11 @@
       if (document.querySelector(".ytp-ad-player-overlay, .ytp-ad-player-overlay-layout, .ytp-ad-text, [class*='ad-interrupting']")) {
         return true;
       }
-      // Check if skip button is present
       const skipBtn = document.querySelector(
         ".ytp-ad-skip-button-modern, .ytp-skip-ad-button, .ytp-ad-skip-button, [class*='skip-button']"
       );
       if (skipBtn) return true;
 
-      // Check for ad badge or "Được tài trợ" on player
       const adBadge = document.querySelector(".ytp-ad-badge, .ytp-ad-text, #movie_player [aria-label*='Được tài trợ']");
       if (adBadge) return true;
 
@@ -152,7 +150,6 @@
         ? player.querySelector("video")
         : (document.querySelector("video.html5-main-video") || document.querySelector("video"));
 
-      // Always try clicking skip buttons if present
       this.clickSkipButtons();
 
       if (isAdShowing) {
@@ -162,29 +159,16 @@
             this.savedMuted = Boolean(video.muted);
           }
           this.wasAdShowing = true;
-          this.adFastForwarded = false;
         }
 
         if (video) {
           video.muted = true;
           video.playbackRate = 16.0;
-
-          // Advance by 5s once so the skip button appears immediately
-          if (!this.adFastForwarded && Number.isFinite(video.duration) && video.duration > 0) {
-            this.adFastForwarded = true;
-            try {
-              if (video.currentTime < 5) {
-                video.currentTime = Math.min(video.currentTime + 5, video.duration);
-              }
-            } catch (_) {}
-          }
-
           if (video.paused && !video.ended) {
             video.play().catch(() => {});
           }
         }
 
-        // Hide overlay banners on top of the player
         const overlays = document.querySelectorAll(
           ".ytp-ad-player-overlay, .ytp-ad-player-overlay-layout, .ytp-ad-overlay-container, .ytp-ad-message-container, .ytp-ad-action-interstitial, .ytp-ad-image-overlay, .ytp-ad-overlay-slot"
         );
@@ -195,7 +179,6 @@
         });
       } else if (this.wasAdShowing) {
         this.wasAdShowing = false;
-        this.adFastForwarded = false;
         if (video) {
           video.playbackRate = this.savedPlaybackRate || 1;
           video.muted = this.savedMuted;
@@ -205,7 +188,6 @@
         }
       }
 
-      // Close banner overlays on the player
       const closeButtons = [
         ".ytp-ad-overlay-close-button",
         ".ytp-ad-overlay-close-container",
@@ -220,7 +202,6 @@
     }
 
     removeFeedAds() {
-      // 1. Hide known ad components across YouTube
       const adSlots = document.querySelectorAll(
         "ytd-ad-slot-renderer, ytd-in-feed-ad-layout-renderer, ytd-banner-promo-renderer, ytd-statement-banner-renderer, #masthead-ad, ytd-display-ad-renderer, ytd-promoted-sparkles-web-renderer, ytd-promoted-video-renderer, ytd-compact-promoted-video-renderer"
       );
@@ -231,7 +212,6 @@
         }
       });
 
-      // 2. Scan all badge elements across YouTube that contain "Được tài trợ" or "Sponsored"
       const allBadges = document.querySelectorAll(
         "#badge, .badge-shape-wiz__text, [aria-label*='Được tài trợ'], [aria-label*='Sponsored'], .ytd-badge-supported-renderer, yt-formatted-string.ytd-badge-supported-renderer"
       );
@@ -276,7 +256,6 @@
     stop() {
       this.isRunning = false;
       this.wasAdShowing = false;
-      this.adFastForwarded = false;
       if (this.intervalId) {
         clearInterval(this.intervalId);
         this.intervalId = null;
