@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Universal Ad Blocker</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup">
+      <header>
+        <div>
+          <p class="eyebrow">Universal</p>
+          <h1>Ad Blocker</h1>
+        </div>
+        <span id="statusDot" class="status-dot" aria-hidden="true"></span>
+      </header>
+
+      <section class="status-card">
+        <div>
+          <span>Protection</span>
+          <strong id="statusText">Loading...</strong>
+        </div>
+        <button id="toggleButton" class="toggle" type="button" aria-pressed="false">
+          <span class="toggle-knob"></span>
+        </button>
+      </section>
+
+      <section class="site-card">
+        <span>Current website</span>
+        <strong id="hostname">Checking...</strong>
+        <button id="whitelistButton" type="button" class="secondary" disabled>Whitelist website</button>
+      </section>
+
+      <section class="stats">
+        <div>
+          <strong id="hiddenCount">0</strong>
+          <span>Elements hidden</span>
+        </div>
+        <div>
+          <strong id="blockedCount">0</strong>
+          <span>Requests blocked</span>
+        </div>
+      </section>
+
+      <button id="optionsButton" type="button" class="primary">Open settings</button>
+      <p id="message" class="message" role="status"></p>
+    </main>
+    <script src="../shared/constants.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

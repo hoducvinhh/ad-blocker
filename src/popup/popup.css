@@ -1,0 +1,144 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, Segoe UI, system-ui, sans-serif;
+  background: #f6f8fb;
+  color: #172033;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  width: 340px;
+  margin: 0;
+  background: #f6f8fb;
+}
+
+.popup { padding: 16px; }
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+h1 { margin: 0; font-size: 19px; }
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #94a3b8;
+  box-shadow: 0 0 0 5px #e2e8f0;
+}
+
+.status-dot.on {
+  background: #22c55e;
+  box-shadow: 0 0 0 5px #dcfce7;
+}
+
+.status-card,
+.site-card,
+.stats {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.status-card span,
+.site-card span,
+.stats span {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.status-card strong { display: block; margin-top: 3px; }
+
+.toggle {
+  width: 48px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: #94a3b8;
+  padding: 3px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.toggle.on { background: #22c55e; }
+
+.toggle-knob {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  transition: transform 150ms ease;
+}
+
+.toggle.on .toggle-knob { transform: translateX(20px); }
+
+.site-card { padding: 12px 14px; margin-bottom: 10px; }
+.site-card strong { display: block; margin: 4px 0 10px; word-break: break-all; }
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 10px;
+}
+
+.stats div { padding: 12px 14px; }
+.stats div + div { border-left: 1px solid #e2e8f0; }
+.stats strong { display: block; font-size: 20px; }
+
+button {
+  font: inherit;
+}
+
+.primary,
+.secondary {
+  width: 100%;
+  border-radius: 9px;
+  border: 1px solid #cbd5e1;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+.primary {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+.secondary {
+  background: #fff;
+  color: #334155;
+}
+
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.message {
+  min-height: 16px;
+  margin: 8px 0 0;
+  color: #b91c1c;
+  font-size: 12px;
+  text-align: center;
+}
